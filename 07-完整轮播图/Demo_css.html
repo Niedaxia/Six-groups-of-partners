@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style type="text/css">
+    * {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      border: 0;
+    }
+    
+    .all {
+      width: 500px;
+      height: 200px;
+      padding: 7px;
+      border: 1px solid #ccc;
+      margin: 100px auto;
+      position: relative;
+    }
+    
+    .screen {
+      width: 500px;
+      height: 200px;
+      /*overflow: hidden;*/
+      position: relative;
+    }
+    
+    .screen li {
+      width: 500px;
+      height: 200px;
+      overflow: hidden;
+      float: left;
+    }
+    
+    .screen ul {
+      position: absolute;
+      left: 0;
+      top: 0px;
+      width: 3000px;
+    }
+    
+    .all ol {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      line-height: 20px;
+      text-align: center;
+    }
+    
+    .all ol li {
+      float: left;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    
+    .all ol li.current {
+      background: yellow;
+    }
+    
+    #arr {
+      display: none;
+    }
+    
+    #arr span {
+      width: 40px;
+      height: 40px;
+      position: absolute;
+      left: 5px;
+      top: 50%;
+      margin-top: -20px;
+      background: #000;
+      cursor: pointer;
+      line-height: 40px;
+      text-align: center;
+      font-weight: bold;
+      font-family: '黑体';
+      font-size: 30px;
+      color: #fff;
+      opacity: 0.3;
+      border: 1px solid #fff;
+    }
+    
+    #arr #right {
+      right: 5px;
+      left: auto;
+    }
+  </style>
+</head>
+<body>
+<div class="all" id='box'>
+  <div class="screen">
+    <ul>
+      <li><img src="images/1.jpg" width="500" height="200"/></li>
+      <li><img src="images/2.jpg" width="500" height="200"/></li>
+      <li><img src="images/3.jpg" width="500" height="200"/></li>
+      <li><img src="images/4.jpg" width="500" height="200"/></li>
+      <li><img src="images/5.jpg" width="500" height="200"/></li>
+    </ul>
+    <ol>
+      <!-- 动态创建的小方块，添加在这里，样式已经给写好了-->
+    </ol>
+  </div>
+  <div id="arr"><span id="left">&lt;</span><span id="right">&gt;</span></div>
+</div>
+<script>
+  //1 获取元素
+  var box = document.getElementById("box");
+  var screenBox = box.children[0];//可视区域
+  var imgWid = screenBox.offsetWidth;//图片宽度
+  var ul = screenBox.children[0];//运动的列表
+  var ol = screenBox.children[1];//底部操作的小方块
+  var arrBox = box.children[1];//箭头的父盒子
+  var arrLeft = arrBox.children[0];
+  var arrRight = arrBox.children[1];
+  //以下是对重复使用的变量进行提前声明
+  var li;
+  
+  //2 根据当前的图片张数创建底部的小方块
+  for (var i = 0; i < ul.children.length; i++) {
+    li = document.createElement("li");//创建li
+    setText(li, i + 1);//设置li的文本
+    ol.appendChild(li);
+  }
+  
+  //3 给第一个小方块设置默认的类名
+  var lisOl = ol.children;//所有操作的小方块
+  lisOl[0].className = "current";
+  
+  //4 给小方块添加点击按钮变色和ul运动
+  for (var i = 0; i < lisOl.length; i++) {
+    lisOl[i].index = i;//设置索引值
+    lisOl[i].onclick = function () {
+      //检测，如果当前图片的状态为lisUl.length-1（当前显示的为假的第一张） 这时将ul抽回到真的第一张显示的位置
+      if (picCount == lisUl.length - 1) {
+        ul.style.left = 0 + "px";
+      }
+      
+      for (var i = 0; i < lisOl.length; i++) {
+        lisOl[i].className = "";
+      }
+      this.className = "current";
+      
+      //5 根据当前按钮的索引值，设置list运动的位置
+      var target = -this.index * imgWid;
+      animate(ul, target);
+      
+      //点击小方块时，同步picCount的值
+      picCount = this.index;
+    };
+  }
+  
+  //-----------------左右按钮点击运动部分------------------
+  
+  
+  //克隆第一张图片，再将假的第一张放置到ul的子节点最后
+  var lisUl = ul.children;
+  var firstPic = lisUl[0].cloneNode(true);
+  ul.appendChild(firstPic);//放入到ul中
+  
+  //2 点击右按钮运动
+  //声明一个变量用于控制滚过的图片张数
+  var picCount = 0;
+  
+  arrRight.onclick = function () {
+    //特殊点，当页面显示的是假的第一张时，需要先进行抽回，再运动
+    if (picCount == lisUl.length - 1) {
+      //抽回到真的第一张显示的位置上
+      ul.style.left = 0 + "px";
+      //抽回后，将picCount更改为对应的值
+      picCount = 0;
+    }//不要将后面的代码放入到else中，因为每次点击都需要运动
+    
+    picCount++;
+    //根据picCount的值设置ul运动的位置
+    animate(ul, -picCount * imgWid);
+    
+    //根据picCount设置需要变色的小方块
+    for (var i = 0; i < lisOl.length; i++) {
+      lisOl[i].className = "";
+    }
+    
+    //由于图片张数多余按钮个数，这时最后一个picCount会导致取值错误，需要单独判断
+    if (picCount == lisUl.length - 1) {
+      lisOl[0].className = "current";
+    } else {
+      lisOl[picCount].className = "current";
+    }
+    
+    
+  };
+  
+  //3 左按钮运动效果
+  arrLeft.onclick = function () {
+    //当页面显示真的第一张时，抽回到假的第一张显示的位置，再滚动
+    if (picCount == 0) {
+      ul.style.left = -(ul.offsetWidth - imgWid) + "px";
+      picCount = lisUl.length - 1;
+    }
+    
+    picCount--;
+    //根据picCount的值设置ul运动的位置
+    animate(ul, -picCount * imgWid);
+    
+    //根据picCount设置需要变色的小方块
+    for (var i = 0; i < lisOl.length; i++) {
+      lisOl[i].className = "";
+    }
+    
+    //点击左按钮时，picCount在使用时无法取到5，所以不需要单独判断
+    //console.log(picCount);
+    lisOl[picCount].className = "current";
+  };
+  
+  //--------------------自动播放----------------------
+  //通过观察我们发现，自动播放实际上就是每隔一段时间，执行一次右按钮的所有代码效果
+  //arrRight.click();  //直接触发某个按钮的点击事件
+  var timer = null;
+  
+  
+  timer = setInterval(function () {
+//    //调用右按钮的点击效果
+//    //click方法用于事件触发（推荐方式）
+    arrRight.click();
+//
+//    //通过函数调用的方式触发
+//    //arrRight.onclick();
+//
+//    //注意，这个时间不要太短，一定要大于图片滚动一次的时间
+  }, 2500);
+  
+  
+  //1 设置移入移出效果:注意不要将事件设置给screenBox，否则会闪烁
+  box.onmouseover = function () {
+    arrBox.style.display = "block";
+    //移入时，清除自动播放
+    clearInterval(timer);
+  };
+  box.onmouseout = function () {
+    arrBox.style.display = "none";
+//    //移出时开启定时器
+    timer = setInterval(function () {
+      //调用右按钮的点击效果
+      arrRight.click();
+      //注意，这个时间不要太短，一定要大于图片滚动一次的时间
+    }, 2500)
+  };
+  
+  
+  //--------------一下为需要的函数
+  function setText(tag, text) {
+    if (tag.innerText === undefined) {
+      tag.textContent = text;
+    } else {
+      tag.innerText = text;
+    }
+  }
+  
+  function animate(tag, target) {
+    clearInterval(tag.timer);//防止加速
+    tag.timer = setInterval(function () {
+      var leader = tag.offsetLeft;//获取元素当前位置
+      var step = (target - leader) / 10;//计算步长
+      step = step > 0 ? Math.ceil(step) : Math.floor(step);//取整
+      leader = leader + step;//运动公式
+      tag.style.left = leader + "px";//设置给box
+      if (leader == target) {
+        clearInterval(tag.timer);
+      }
+    }, 20);
+  }
+</script>
+</body>
+</html>
