@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div></div>
+    <script>
+        // 1.获取元素
+        var div = document.querySelector('div');
+        // 2.注册事件，处理程序
+        div.onclick = function () {
+            this.style.backgroundColor = 'purple'; // 点击后颜色变成purple  backgroundColor 驼峰命名法
+            this.style.width = '300px'; //点击后变宽
+        }
+        // 在js里面修改的样式属于行内样式  css样式的权重较高
+    </script>
+</body>
+
+</html>
