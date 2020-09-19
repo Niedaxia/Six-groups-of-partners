@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: #000;
+        }
+
+        .box {
+            width: 340px;
+            height: 420px;
+            border: 1px solid;
+            margin: 100px auto;
+            position: relative;
+            overflow: hidden;
+
+        }
+
+        span {
+            position: absolute;
+            width: 50px;
+            height: 500px;
+            background-color: #ccc;
+            transform: skewX(-30deg);
+            left: -200px;
+            /* transition: all 1s; */
+            /* 过度放在这会看到执行两次鼠标经过一次 鼠标拿开一次 */
+        }
+
+        .box:hover span {
+            left: 600px;
+            transition: all 1s;
+            /* 过度放在这只看到执行一次 还有一次呗隐藏掉了 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <img src="./images/pro.jpg" alt="">
+        <span></span>
+    </div>
+</body>
+
+</html>
